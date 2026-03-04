@@ -1,35 +1,32 @@
-name: CI/CD DevSecOps Pipeline  # اسم البروجكت اللي هيظهر في جيت هاب
+name: CI/CD DevSecOps Pipeline
 
 on:
   push:
-    branches: [ "main" ]  # يشتغل أول ما تعمل Push لفرع الـ main
-  pull_request:
     branches: [ "main" ]
 
 jobs:
   build-test:
-    runs-on: ubuntu-latest  # الجهاز اللي جيت هاب هيوفره لنا (الـ Runner)
+    runs-on: ubuntu-latest
+
+    # 💡 دي أهم حتة: بتقوله كل الأوامر اللي جاية "سكينتها" جوه app/src
+    defaults:
+      run:
+        working-directory: app/src
 
     steps:
-      # 1. سحب الكود من المستودع
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      # 2. تجهيز البيئة (Node.js)
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '18'
-          cache: 'npm' # بيخلي الـ npm install أسرع في المرات الجاية
+          # 💡 هنا بنقوله يدور على ملف الـ lock جوه الفولدر الصح عشان الـ Cache يشتغل
+          cache: 'npm'
+          cache-dependency-path: app/src/package-lock.json
 
-      # 3. تثبيت المكتبات (نفس اللي عملته عندك بس بطريقة احترافية)
       - name: Install Dependencies
-        run: |
-          cd app/src//package-lock.json
-          npm ci  # بستخدم ci بدل install عشان يقرأ من الـ package-lock بالظبط
+        run: npm ci
 
-      # 4. تشغيل الاختبارات (الـ Unit Test اللي عملناه)
       - name: Run Unit Tests
-        run: |
-          cd app/src
-          npm test
+        run: npm test
