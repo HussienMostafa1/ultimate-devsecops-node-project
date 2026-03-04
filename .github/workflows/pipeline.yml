@@ -1,0 +1,35 @@
+name: CI/CD DevSecOps Pipeline  # اسم البروجكت اللي هيظهر في جيت هاب
+
+on:
+  push:
+    branches: [ "main" ]  # يشتغل أول ما تعمل Push لفرع الـ main
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest  # الجهاز اللي جيت هاب هيوفره لنا (الـ Runner)
+
+    steps:
+      # 1. سحب الكود من المستودع
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # 2. تجهيز البيئة (Node.js)
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm' # بيخلي الـ npm install أسرع في المرات الجاية
+
+      # 3. تثبيت المكتبات (نفس اللي عملته عندك بس بطريقة احترافية)
+      - name: Install Dependencies
+        run: |
+          cd app/rsc
+          npm ci  # بستخدم ci بدل install عشان يقرأ من الـ package-lock بالظبط
+
+      # 4. تشغيل الاختبارات (الـ Unit Test اللي عملناه)
+      - name: Run Unit Tests
+        run: |
+          cd app/rsc
+          npm test
