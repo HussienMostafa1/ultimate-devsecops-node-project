@@ -25,11 +25,11 @@ jobs:
       # 3. تثبيت المكتبات (نفس اللي عملته عندك بس بطريقة احترافية)
       - name: Install Dependencies
         run: |
-          cd app/rsc
+          cd app/src
           npm ci  # بستخدم ci بدل install عشان يقرأ من الـ package-lock بالظبط
 
       # 4. تشغيل الاختبارات (الـ Unit Test اللي عملناه)
       - name: Run Unit Tests
         run: |
-          cd app/rsc
+          cd app/src
           npm test
