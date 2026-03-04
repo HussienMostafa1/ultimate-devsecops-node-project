@@ -25,7 +25,7 @@ jobs:
       # 3. تثبيت المكتبات (نفس اللي عملته عندك بس بطريقة احترافية)
       - name: Install Dependencies
         run: |
-          cd app/src
+          cd app/src//package-lock.json
           npm ci  # بستخدم ci بدل install عشان يقرأ من الـ package-lock بالظبط
 
       # 4. تشغيل الاختبارات (الـ Unit Test اللي عملناه)
