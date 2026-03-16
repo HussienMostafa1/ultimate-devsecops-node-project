@@ -3,30 +3,42 @@ name: CI/CD DevSecOps Pipeline
 on:
   push:
     branches: [ "main" ]
+  pull_request:
+    types: [opened, synchronize, reopened]
 
 jobs:
-  build-test:
+  build-test-security:
     runs-on: ubuntu-latest
 
-    # 💡 دي أهم حتة: بتقوله كل الأوامر اللي جاية "سكينتها" جوه app/src
-    defaults:
-      run:
-        working-directory: app/src
-
     steps:
+      # 1. سحب الكود مع الـ History كامل للسونار
       - name: Checkout Code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 
 
+      # 2. تجهيز البيئة (Node.js)
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '18'
-          # 💡 هنا بنقوله يدور على ملف الـ lock جوه الفولدر الصح عشان الـ Cache يشتغل
           cache: 'npm'
           cache-dependency-path: app/src/package-lock.json
 
+      # 3. تحميل المكتبات (جوّه app/src)
       - name: Install Dependencies
-        run: npm ci
+        run: |
+          cd app/src
+          npm ci
 
+      # 4. تشغيل الاختبارات واستخراج تقرير الـ Coverage
       - name: Run Unit Tests
-        run: npm test
+        run: |
+          cd app/src
+          npm test -- --coverage
+
+      # 5. فحص السونار (هيقرأ ملف sonar-project.properties لوحده)
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v5
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

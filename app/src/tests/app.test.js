@@ -1,11 +1,26 @@
-// app/tests/app.test.js
 const request = require('supertest');
-const express = require('express');
+const app = require('../server'); // بننادي الكود الحقيقي بتاعنا
 
-// مثال بسيط جداً لتست ينجح دايماً
-describe('GET /', () => {
-  it('should return 200 OK', async () => {
-    // هنا المفروض نستدعي الكود الحقيقي، بس دي فكرة الـ Unit Test
-    expect(200).toBe(200);
+describe('Security & Functionality Tests', () => {
+  
+  // 1. تيست الصفحة الرئيسية
+  it('should return 200 for the home page', async () => {
+    const res = await request(app).get('/');
+    expect(res.statusCode).toEqual(200);
+    expect(res.text).toContain('Ultimate DevSecOps');
+  });
+
+  // 2. تيست ثغرة الـ Info (الخطر)
+  it('should return server info (The Vulnerability)', async () => {
+    const res = await request(app).get('/info');
+    expect(res.statusCode).toEqual(200);
+    // التيست ده "بيلمس" الكود اللي فيه ثغرة فالسونار يعرف إننا اختبرناه
+  });
+
+  // 3. تيست ثغرة الـ XSS
+  it('should reflect the name in greet (XSS)', async () => {
+    const res = await request(app).get('/greet?name=Hussien');
+    expect(res.statusCode).toEqual(200);
+    expect(res.text).toContain('Hello, Hussien');
   });
 });
